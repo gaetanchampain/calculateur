@@ -268,7 +268,7 @@ function compute() {
   DEVIS.concat(TACHES).forEach(([k]) => set('g-' + k, n1(m.per[k]) + 'h'));
   $('ro-ventes').innerHTML = 'Soit <b>' + n0(m.devis) + ' devis par mois</b>, <b>' + n0(m.signMois * 12) + ' affaires signées</b> par an et environ <b>' + eur(m.caAn) + '</b> de chiffre d\'affaires. Est-ce que ça correspond à votre réalité ?';
   set('o-h', n0(m.H)); set('o-hd', n0(m.byRole.d) + 'h');
-  set('o-dj', n1(m.dj) + (m.dj >= 2 ? ' demi-journées' : ' demi-journée'));
+  set('o-dj', n1(m.dj) + (Math.round(m.dj * 10) / 10 >= 2 ? ' demi-journées' : ' demi-journée'));
   set('o-cat', n0(m.catH) + 'h'); set('o-val', eur(m.val));
   set('o-splus', '+ ' + n0(m.sPlus * 12)); set('o-ca', '+ ' + eur(m.caPlus)); set('o-marge', '+ ' + eur(m.margePlus));
   set('o-growth', m.caAn > 0 ? 'soit + ' + n0(m.caPlus / m.caAn * 100) + ' %' : '');
