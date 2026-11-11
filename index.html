@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Calculateur Champain Advisory</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+<style>
+/* Mise en page : les questions de l'entretien à gauche, le résultat en grand à droite. Les réglages fins restent repliés. */
+:root {
+  --bg: #F6F6F1; --surface: #FFFFFF; --ink: #121410; --muted: #5E6058; --line: #E4E5DD; --field: #F6F6F1;
+  --lime: #C6F542; --on-lime: #121410; --soft: #EEFBC8;
+  --panel: #121410; --panel-fg: #F6F6F1; --panel-muted: #A7A9A1; --panel-line: #2E302A; --panel-card: #1E201B;
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif; --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121410; --surface: #1C1E19; --ink: #F6F6F1; --muted: #A7A9A1; --line: #2E302A; --field: #121410;
+  --lime: #C6F542; --on-lime: #121410; --soft: #2B3318;
+  --panel: #1C1E19; --panel-fg: #F6F6F1; --panel-muted: #A7A9A1; --panel-line: #34362F; --panel-card: #262921; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121410; --surface: #1C1E19; --ink: #F6F6F1; --muted: #A7A9A1; --line: #2E302A; --field: #121410;
+  --lime: #C6F542; --on-lime: #121410; --soft: #2B3318;
+  --panel: #1C1E19; --panel-fg: #F6F6F1; --panel-muted: #A7A9A1; --panel-line: #34362F; --panel-card: #262921; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 56px }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px }
+.top { display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; justify-content: space-between }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.01em }
+.brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--lime); border: 1px solid var(--ink) }
+.brand span { color: var(--muted); font-weight: 500; font-size: 14px }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+button, select, input { font: inherit }
+button { cursor: pointer; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 15px; font-weight: 600; font-size: 14px }
+button.primary { background: var(--lime); color: var(--on-lime); border-color: var(--lime) }
+button.ghost { background: transparent }
+:is(button, input, select):focus-visible { outline: 3px solid var(--lime); outline-offset: 2px }
+#prospect { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; color: var(--ink); font-weight: 700; width: 15em; max-width: 100% }
+#saved { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; color: var(--ink); font-size: 14px; max-width: 12em }
+#toast { font-size: 13px; color: var(--muted); min-height: 1.2em }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr) } }
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.card { background: var(--surface); border-radius: var(--r); padding: 20px 22px; min-width: 0 }
+.card h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0 0 4px }
+.card .q { font-size: 19px; font-weight: 800; margin: 0 0 12px; text-wrap: balance }
+.head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start }
+.chip { font-size: 12px; padding: 5px 11px; white-space: nowrap; color: var(--muted) }
+.chip[aria-pressed="true"] { background: var(--lime); color: var(--on-lime); border-color: var(--lime) }
+
+.scroll { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums }
+th { text-align: right; font-size: 12px; color: var(--muted); font-weight: 600; padding: 0 0 6px 10px; white-space: nowrap }
+th:first-child { text-align: left; padding-left: 0 }
+td { padding: 6px 0 6px 10px; border-top: 1px solid var(--line); text-align: right; vertical-align: middle }
+td:first-child { text-align: left; padding-left: 0; font-weight: 700 }
+td small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px }
+td.gain { font-weight: 800; white-space: nowrap; min-width: 4.2em }
+input[type="number"] { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--field); border: 1px solid transparent; border-radius: 9px; padding: 8px 8px; width: 4.9em; text-align: right }
+input[type="number"]:hover { border-color: var(--line) }
+td select, .f select { background: var(--field); color: var(--ink); border: 1px solid transparent; border-radius: 9px; padding: 8px 6px; font-weight: 600; font-size: 14px }
+.adv { display: none }
+.show-adv .adv { display: revert }
+.show-adv table { min-width: 560px }
+
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px }
+.f label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px }
+.f .ctl { display: flex; align-items: center; gap: 8px }
+.f input[type="number"] { width: 100%; max-width: 7em; font-size: 17px }
+.f .u { color: var(--muted); font-size: 13px; white-space: nowrap }
+.readout { margin-top: 12px; background: var(--soft); border-radius: 10px; padding: 10px 14px; font-size: 14px }
+.readout b { font-weight: 800 }
+.sub { font-size: 13px; color: var(--muted); margin: 14px 0 8px; font-weight: 700 }
+
+.results { position: sticky; top: calc(14px + env(safe-area-inset-top, 0px)); background: var(--panel); color: var(--panel-fg); border-radius: var(--r); padding: 24px; display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+@media (max-width: 900px) { .results { position: static } }
+.results h3 { margin: 0 0 6px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--panel-muted); font-weight: 700 }
+.hero { font-size: clamp(52px, 7vw, 76px); font-weight: 800; line-height: .95; letter-spacing: -.02em; color: var(--lime); font-variant-numeric: tabular-nums }
+.hero small { font-size: 18px; font-weight: 600; color: var(--panel-fg); margin-left: 2px; letter-spacing: 0 }
+.results p { margin: 6px 0 0; color: var(--panel-muted); font-size: 14px }
+.results p b { color: var(--panel-fg) }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px }
+.tile { background: var(--panel-card); border-radius: 12px; padding: 14px 16px; min-width: 0 }
+.tile.lime { background: var(--lime); color: var(--on-lime) }
+.tile .v { font-size: 26px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums }
+.tile .l { font-size: 12.5px; color: var(--panel-muted); margin-top: 4px }
+.tile.lime .l { color: var(--on-lime) }
+.tiles.duo { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+.tiles.duo .tile:first-child { grid-column: 1 / -1 }
+.tiles.duo .v { white-space: nowrap; font-size: clamp(20px, 2.1vw, 26px) }
+@media (max-width: 520px) { .tiles.duo { grid-template-columns: minmax(0, 1fr) } }
+.rule { border-top: 1px solid var(--panel-line); padding-top: 16px }
+.fine { font-size: 12.5px; color: var(--panel-muted) }
+#copy-out { width: 100%; min-height: 170px; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px }
+</style>
+<style>html,body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="brand"><i></i>Champain Advisory <span>Calculateur de gains</span></div>
+    <div class="bar">
+      <input id="prospect" type="text" placeholder="Nom du prospect" aria-label="Nom du prospect" autocomplete="off">
+      <button type="button" id="btn-save">Enregistrer</button>
+      <select id="saved" aria-label="Prospects enregistrés"><option value="">Prospects enregistrés</option></select>
+      <button type="button" class="primary" id="btn-copy">Copier la synthèse</button>
+    </div>
+  </header>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <textarea id="copy-out" hidden aria-label="Synthèse à copier"></textarea>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <div class="head"><div><h2>Les devis</h2><p class="q">Combien de devis par mois, et combien de temps pour chacun ?</p></div><button type="button" class="chip" data-v="devis" aria-pressed="false">À valider</button></div>
+        <div class="scroll"><table id="t-devis"></table></div>
+      </section>
+
+      <section class="card">
+        <div class="head"><div><h2>Les ventes</h2><p class="q">Que deviennent ces devis ?</p></div><button type="button" class="chip" data-v="ventes" aria-pressed="false">À valider</button></div>
+        <div class="fields">
+          <div class="f"><label for="f-sign">Part de devis signés</label><div class="ctl"><input type="number" id="f-sign" data-k="sign" min="0" max="100" step="1" inputmode="decimal"><span class="u">%</span></div></div>
+          <div class="f"><label for="f-panier">Montant moyen d'un devis signé</label><div class="ctl"><input type="number" id="f-panier" data-k="panier" min="0" step="100" inputmode="decimal"><span class="u">€ HT</span></div></div>
+          <div class="f"><label for="f-marge">Marge brute sur une affaire</label><div class="ctl"><input type="number" id="f-marge" data-k="marge" min="0" max="100" step="1" inputmode="decimal"><span class="u">%</span></div></div>
+        </div>
+        <div class="readout" id="ro-ventes"></div>
+      </section>
+
+      <section class="card">
+        <div class="head"><div><h2>Les autres tâches</h2><p class="q">Et autour des devis ?</p></div><button type="button" class="chip" data-v="taches" aria-pressed="false">À valider</button></div>
+        <div class="scroll"><table id="t-taches"></table></div>
+        <p class="sub">Le catalogue à créer, une seule fois</p>
+        <div class="fields">
+          <div class="f"><label for="f-articles">Articles réellement utilisés</label><div class="ctl"><input type="number" id="f-articles" data-k="articles" min="0" step="50" inputmode="decimal"><span class="u">articles</span></div></div>
+          <div class="f"><label for="f-t_art">Temps pour en créer un à la main</label><div class="ctl"><input type="number" id="f-t_art" data-k="t_art" min="0" step="0.5" inputmode="decimal"><span class="u">min</span></div></div>
+          <div class="f adv"><label for="f-who_cat">Qui s'en charge</label><div class="ctl"><select id="f-who_cat" data-k="who_cat"><option value="d">Dirigeant</option><option value="c">Commercial</option><option value="g">Gestion</option></select></div></div>
+        </div>
+      </section>
+
+      <section class="card adv">
+        <h2>Réglages détaillés</h2>
+        <p class="sub">La valeur d'une heure</p>
+        <div class="fields">
+          <div class="f"><label for="f-rate_d">Dirigeant</label><div class="ctl"><input type="number" id="f-rate_d" data-k="rate_d" min="0" step="1" inputmode="decimal"><span class="u">€ par heure</span></div></div>
+          <div class="f"><label for="f-rate_c">Commercial</label><div class="ctl"><input type="number" id="f-rate_c" data-k="rate_c" min="0" step="1" inputmode="decimal"><span class="u">€ par heure</span></div></div>
+          <div class="f"><label for="f-rate_g">Gestion</label><div class="ctl"><input type="number" id="f-rate_g" data-k="rate_g" min="0" step="1" inputmode="decimal"><span class="u">€ par heure</span></div></div>
+        </div>
+        <p class="sub">Le temps réinvesti dans la vente</p>
+        <div class="fields">
+          <div class="f"><label for="f-reinv">Part du temps libéré qui repart dans la vente</label><div class="ctl"><input type="number" id="f-reinv" data-k="reinv" min="0" max="100" step="5" inputmode="decimal"><span class="u">%</span></div></div>
+          <div class="f"><label for="f-h_devis">Travail commercial pour un devis de plus</label><div class="ctl"><input type="number" id="f-h_devis" data-k="h_devis" min="0.5" step="0.5" inputmode="decimal"><span class="u">heures</span></div></div>
+          <div class="f"><label for="f-pts">Gain de signature grâce à la rapidité</label><div class="ctl"><input type="number" id="f-pts" data-k="pts" min="0" max="50" step="1" inputmode="decimal"><span class="u">points</span></div></div>
+        </div>
+        <p class="sub">L'offre</p>
+        <div class="fields">
+          <div class="f"><label for="f-setup">Mise en place</label><div class="ctl"><input type="number" id="f-setup" data-k="setup" min="0" step="100" inputmode="decimal"><span class="u">€ HT</span></div></div>
+          <div class="f"><label for="f-abo">Abonnement, dès le 3e mois</label><div class="ctl"><input type="number" id="f-abo" data-k="abo" min="0" step="10" inputmode="decimal"><span class="u">€ HT par mois</span></div></div>
+        </div>
+      </section>
+
+      <div class="bar">
+        <button type="button" class="ghost" id="btn-adv" aria-pressed="false">Afficher les réglages détaillés</button>
+        <button type="button" class="ghost" id="btn-reset">Revenir aux hypothèses de départ</button>
+      </div>
+    </div>
+
+    <aside class="results" aria-live="polite">
+      <div>
+        <h3>Temps libéré</h3>
+        <div class="hero"><span id="o-h">0</span><small>h par mois</small></div>
+        <p>Soit <b id="o-dj">0</b> par semaine, dont <b id="o-hd">0</b> de dirigeant par mois.</p>
+      </div>
+      <div class="tiles">
+        <div class="tile"><div class="v" id="o-cat">0</div><div class="l">de saisie du catalogue évitées, une seule fois</div></div>
+        <div class="tile"><div class="v" id="o-val">0</div><div class="l">de temps économisé chaque mois</div></div>
+      </div>
+      <div class="rule">
+        <h3>Si ce temps repart dans la vente</h3>
+        <div class="tiles duo">
+          <div class="tile"><div class="v" id="o-splus">0</div><div class="l">affaires signées en plus par an</div></div>
+          <div class="tile"><div class="v" id="o-ca">0</div><div class="l">de chiffre d'affaires en plus, <span id="o-growth"></span></div></div>
+          <div class="tile"><div class="v" id="o-marge">0</div><div class="l">de marge brute en plus par an</div></div>
+        </div>
+        <p class="fine" id="o-chain"></p>
+      </div>
+      <div class="rule">
+        <h3>Retour sur investissement</h3>
+        <div class="tiles">
+          <div class="tile lime"><div class="v" id="o-aff">0</div><div class="l">signées en plus remboursent la mise en place</div></div>
+          <div class="tile lime"><div class="v" id="o-pay">0</div><div class="l">pour la rembourser par le temps économisé, abonnement compris</div></div>
+        </div>
+        <p class="fine">Investissement la première année : <b id="o-inv1">0</b>. Les années suivantes : <b id="o-inv2">0</b>.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const DEF = {
+  prospect: '',
+  n_p: 12, av_p: 15, ap_p: 2, who_p: 'd',
+  n_m: 10, av_m: 30, ap_m: 5, who_m: 'd',
+  n_g: 6, av_g: 60, ap_g: 10, who_g: 'd',
+  n_cmd: 15, av_cmd: 20, ap_cmd: 2, who_cmd: 'g',
+  n_int: 30, av_int: 15, ap_int: 3, who_int: 'd',
+  n_cr: 20, av_cr: 10, ap_cr: 1, who_cr: 'c',
+  n_pt: 4, av_pt: 60, ap_pt: 0, who_pt: 'd',
+  articles: 1500, t_art: 2, who_cat: 'd',
+  sign: 35, panier: 5000, marge: 40,
+  rate_d: 60, rate_c: 45, rate_g: 45,
+  reinv: 50, h_devis: 4, pts: 0,
+  setup: 11900, abo: 390,
+  valid: {}
+};
+const DEVIS = [['p', 'Petits devis', 'SAV, ajout de matériel'], ['m', 'Devis moyens', 'installation standard'], ['g', 'Grands devis', 'site complet, avec ou sans plan']];
+const TACHES = [['cmd', 'Commandes fournisseurs', ''], ['int', 'Interventions à planifier', ''], ['cr', 'Comptes rendus de rendez-vous', ''], ['pt', 'Points commerciaux', '']];
+const ROLES = { d: 'Dirigeant', c: 'Commercial', g: 'Gestion' };
+const KEY = 'champain-calc-v2';
+const clone = o => JSON.parse(JSON.stringify(o));
+let STORE = { cur: clone(DEF), saved: {} };
+try { const r = JSON.parse(localStorage.getItem(KEY)); if (r && r.cur) STORE = { cur: Object.assign(clone(DEF), r.cur, { valid: Object.assign({}, r.cur.valid) }), saved: r.saved || {} }; } catch (e) {}
+let S = STORE.cur;
+function persist() { STORE.cur = S; try { localStorage.setItem(KEY, JSON.stringify(STORE)); } catch (e) {} }
+
+const nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const n0 = v => nf0.format(Math.round(v));
+const n1 = v => nf1.format(Math.round(v * 10) / 10);
+const eur = v => nf0.format(Math.abs(v) >= 10000 ? Math.round(v / 100) * 100 : Math.round(v / 10) * 10) + ' €';
+const num = v => { const x = parseFloat(String(v).replace(',', '.')); return isFinite(x) ? x : 0; };
+const $ = id => document.getElementById(id);
+const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+
+function table(id, rows) {
+  const inp = (k, label, step) => '<input type="number" id="f-' + k + '" data-k="' + k + '" min="0" step="' + (step || 1) + '" inputmode="decimal" aria-label="' + label + '">';
+  $(id).innerHTML = '<thead><tr><th>Tâche</th><th>Par mois</th><th>Minutes aujourd\'hui</th><th class="adv">Minutes avec l\'outil</th><th class="adv">Qui la fait</th><th>Gagné</th></tr></thead><tbody>' +
+    rows.map(([k, name, hint]) => '<tr><td>' + name + (hint ? '<small>' + hint + '</small>' : '') + '</td>' +
+      '<td>' + inp('n_' + k, name + ', nombre par mois') + '</td><td>' + inp('av_' + k, name + ', minutes aujourd\'hui') + '</td>' +
+      '<td class="adv">' + inp('ap_' + k, name + ', minutes avec l\'outil') + '</td>' +
+      '<td class="adv"><select id="f-who_' + k + '" data-k="who_' + k + '" aria-label="' + name + ', qui la fait">' + Object.entries(ROLES).map(([v, l]) => '<option value="' + v + '">' + l + '</option>').join('') + '</select></td>' +
+      '<td class="gain" id="g-' + k + '"></td></tr>').join('') + '</tbody>';
+}
+
+function model() {
+  const all = DEVIS.concat(TACHES); const per = {}; const byRole = { d: 0, c: 0, g: 0 }; let H = 0;
+  all.forEach(([k]) => { const h = S['n_' + k] * Math.max(S['av_' + k] - S['ap_' + k], 0) / 60; per[k] = h; H += h; byRole[S['who_' + k]] += h; });
+  const rate = { d: S.rate_d, c: S.rate_c, g: S.rate_g };
+  const val = byRole.d * rate.d + byRole.c * rate.c + byRole.g * rate.g;
+  const devis = S.n_p + S.n_m + S.n_g;
+  const catH = S.articles * S.t_art / 60, catVal = catH * rate[S.who_cat];
+  const signMois = devis * S.sign / 100, caAn = signMois * S.panier * 12;
+  const reinvH = H * S.reinv / 100, dPlus = S.h_devis > 0 ? reinvH / S.h_devis : 0;
+  const sPlus = dPlus * S.sign / 100 + devis * S.pts / 100;
+  const caPlus = sPlus * S.panier * 12, margePlus = caPlus * S.marge / 100;
+  const net = val - S.abo, reste = S.setup - catVal;
+  const pay = reste <= 0 ? 0 : (net > 0 ? reste / net : Infinity);
+  const margeAff = S.panier * S.marge / 100, aff = margeAff > 0 ? S.setup / margeAff : Infinity;
+  return { per, H, byRole, val, devis, catH, catVal, signMois, caAn, reinvH, dPlus, sPlus, caPlus, margePlus, pay, aff, inv1: S.setup + S.abo * 10, dj: H / 4.33 / 3.5 };
+}
+
+function compute() {
+  const m = model();
+  DEVIS.concat(TACHES).forEach(([k]) => set('g-' + k, n1(m.per[k]) + 'h'));
+  $('ro-ventes').innerHTML = 'Soit <b>' + n0(m.devis) + ' devis par mois</b>, <b>' + n0(m.signMois * 12) + ' affaires signées</b> par an et environ <b>' + eur(m.caAn) + '</b> de chiffre d\'affaires. Est-ce que ça correspond à votre réalité ?';
+  set('o-h', n0(m.H)); set('o-hd', n0(m.byRole.d) + 'h');
+  set('o-dj', n1(m.dj) + (m.dj >= 2 ? ' demi-journées' : ' demi-journée'));
+  set('o-cat', n0(m.catH) + 'h'); set('o-val', eur(m.val));
+  set('o-splus', '+ ' + n0(m.sPlus * 12)); set('o-ca', '+ ' + eur(m.caPlus)); set('o-marge', '+ ' + eur(m.margePlus));
+  set('o-growth', m.caAn > 0 ? 'soit + ' + n0(m.caPlus / m.caAn * 100) + ' %' : '');
+  set('o-chain', n0(S.reinv) + ' % du temps réinvesti, ' + n1(S.h_devis) + 'h de travail commercial par devis de plus, ' + n0(S.sign) + ' % de signature' + (S.pts > 0 ? ' et ' + n0(S.pts) + ' points de plus grâce à la rapidité' : '') + '.');
+  set('o-aff', isFinite(m.aff) ? n0(Math.ceil(m.aff - 1e-9)) + ' affaires' : 'Non calculable');
+  set('o-pay', m.pay === 0 ? 'Dès la livraison' : (isFinite(m.pay) ? n1(m.pay) + ' mois' : 'Non remboursé'));
+  set('o-inv1', eur(m.inv1)); set('o-inv2', eur(S.abo * 12) + ' par an');
+}
+
+function fill() {
+  document.querySelectorAll('[data-k]').forEach(el => { if (S[el.dataset.k] !== undefined) el.value = S[el.dataset.k]; });
+  $('prospect').value = S.prospect || '';
+  document.querySelectorAll('[data-v]').forEach(b => { const on = !!S.valid[b.dataset.v]; b.setAttribute('aria-pressed', on); b.textContent = on ? 'Validé' : 'À valider'; });
+  const sel = $('saved'); sel.innerHTML = '<option value="">Prospects enregistrés</option>' + Object.keys(STORE.saved).sort().map(n => '<option>' + n.replace(/[<>&"]/g, '') + '</option>').join('');
+}
+function toast(t) { const el = $('toast'); el.textContent = t; clearTimeout(toast.t); toast.t = setTimeout(() => { el.textContent = ''; }, 4500); }
+
+function summary() {
+  const m = model(); const v = id => S.valid[id] ? 'validé' : 'à valider';
+  const line = ([k, name]) => name + ' : ' + n0(S['n_' + k]) + ' par mois, de ' + n0(S['av_' + k]) + ' à ' + n0(S['ap_' + k]) + ' min (' + ROLES[S['who_' + k]].toLowerCase() + ')';
+  return [
+    (S.prospect || 'Prospect') + ', synthèse du ' + new Date().toLocaleDateString('fr-FR'),
+    '',
+    'Devis (' + v('devis') + ')', ...DEVIS.map(line),
+    '',
+    'Ventes (' + v('ventes') + ') : ' + n0(S.sign) + ' % de devis signés, panier moyen ' + eur(S.panier) + ' HT, marge brute ' + n0(S.marge) + ' %. Chiffre d\'affaires annuel calculé : ' + eur(m.caAn) + '.',
+    '',
+    'Autres tâches (' + v('taches') + ')', ...TACHES.map(line),
+    'Catalogue : ' + n0(S.articles) + ' articles à ' + n1(S.t_art) + ' min, soit ' + n0(m.catH) + 'h évitées une seule fois.',
+    '',
+    'Résultats',
+    'Temps libéré : ' + n0(m.H) + 'h par mois, soit ' + n1(m.dj) + ' demi-journée(s) par semaine, dont ' + n0(m.byRole.d) + 'h de dirigeant.',
+    'Temps économisé : ' + eur(m.val) + ' par mois (dirigeant ' + n0(S.rate_d) + ' €/h, commercial ' + n0(S.rate_c) + ' €/h, gestion ' + n0(S.rate_g) + ' €/h).',
+    'Si ' + n0(S.reinv) + ' % de ce temps repart dans la vente : ' + n0(m.sPlus * 12) + ' affaires signées en plus par an, ' + eur(m.caPlus) + ' de chiffre d\'affaires, ' + eur(m.margePlus) + ' de marge brute.',
+    'Offre : ' + eur(S.setup) + ' HT de mise en place, ' + eur(S.abo) + ' HT par mois dès le 3e mois. Remboursée par ' + (isFinite(m.aff) ? n0(Math.ceil(m.aff - 1e-9)) : '?') + ' affaires signées en plus, ou en ' + (isFinite(m.pay) ? n1(m.pay) : 'plus de 99') + ' mois par le temps économisé.'
+  ].join('\n');
+}
+
+table('t-devis', DEVIS); table('t-taches', TACHES);
+$('app').addEventListener('input', e => {
+  const k = e.target.dataset.k; if (!k) return;
+  S[k] = e.target.tagName === 'SELECT' ? e.target.value : num(e.target.value); persist(); compute();
+});
+$('app').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.valid[b.dataset.v] = !S.valid[b.dataset.v]; persist(); fill(); });
+$('prospect').addEventListener('input', e => { S.prospect = e.target.value; persist(); });
+$('btn-adv').addEventListener('click', e => { const on = $('app').classList.toggle('show-adv'); e.currentTarget.setAttribute('aria-pressed', on); e.currentTarget.textContent = on ? 'Masquer les réglages détaillés' : 'Afficher les réglages détaillés'; });
+$('btn-reset').addEventListener('click', () => { const name = S.prospect; S = clone(DEF); S.prospect = name; persist(); fill(); compute(); toast('Hypothèses de départ rétablies.'); });
+$('btn-save').addEventListener('click', () => {
+  const name = (S.prospect || '').trim(); if (!name) { toast('Indiquez d\'abord le nom du prospect.'); $('prospect').focus(); return; }
+  STORE.saved[name] = clone(S); persist(); fill(); $('saved').value = name; toast('« ' + name + ' » enregistré sur ce navigateur.');
+});
+$('saved').addEventListener('change', e => { const n = e.target.value; if (!n || !STORE.saved[n]) return; S = Object.assign(clone(DEF), clone(STORE.saved[n])); persist(); fill(); e.target.value = n; compute(); toast('« ' + n + ' » chargé.'); });
+$('btn-copy').addEventListener('click', () => {
+  const txt = summary(), out = $('copy-out');
+  const fallback = () => { out.hidden = false; out.value = txt; out.focus(); out.select(); toast('Copie automatique impossible ici : le texte est sélectionné, copiez-le avec Ctrl+C ou Cmd+C.'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast('Synthèse copiée.'), fallback); else fallback();
+});
+fill(); compute();
+</script>
+
+</body>
+</html>
